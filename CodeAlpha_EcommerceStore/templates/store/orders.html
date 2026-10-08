@@ -1,0 +1,57 @@
+{% extends "store/base.html" %}
+{% block title %}My Orders — ShopEasy{% endblock %}
+
+{% block content %}
+
+<div class="section-heading">
+  <h2>My Orders</h2>
+  <span class="count">{{ orders|length }} order{{ orders|length|pluralize }}</span>
+</div>
+
+<div class="orders-list">
+
+  {% for order in orders %}
+
+  {% comment %} Determine status CSS class {% endcomment %}
+  {% if order.status == "Pending" %}{% with status_cls="status-pending" %}
+  {% elif order.status == "Processing" %}{% with status_cls="status-processing" %}
+  {% elif order.status == "Shipped" %}{% with status_cls="status-shipped" %}
+  {% elif order.status == "Delivered" %}{% with status_cls="status-delivered" %}
+  {% elif order.status == "Completed" %}{% with status_cls="status-completed" %}
+  {% elif order.status == "Cancelled" %}{% with status_cls="status-cancelled" %}
+  {% else %}{% with status_cls="" %}
+  {% endif %}
+
+  <a class="order-card" href="{% url 'order_detail' order.pk %}">
+
+    <div class="order-card-left">
+      <strong>Order #{{ order.id }}</strong>
+      <time datetime="{{ order.created_at|date:'c' }}">{{ order.created_at|date:"d M Y, h:i A" }}</time>
+      <span style="font-size:.8rem;color:var(--clr-muted);">
+        {{ order.items.count }} item{{ order.items.count|pluralize }}
+      </span>
+    </div>
+
+    <div class="order-card-right">
+      <span class="order-amount">₹{{ order.total_amount }}</span>
+      <span class="status-badge {{ status_cls }}">{{ order.status }}</span>
+      <span style="color:var(--clr-muted);font-size:1.25rem;">›</span>
+    </div>
+
+  </a>
+
+  {% endwith %}
+  {% empty %}
+
+  <div class="empty">
+    <div class="empty-icon">📦</div>
+    <h3>No orders yet</h3>
+    <p>You haven't placed any orders. Start shopping to see them here!</p>
+    <a class="btn btn-primary" href="{% url 'home' %}">Start Shopping</a>
+  </div>
+
+  {% endfor %}
+
+</div>
+
+{% endblock %}

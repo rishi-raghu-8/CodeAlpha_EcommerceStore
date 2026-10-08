@@ -1,0 +1,106 @@
+{% extends "store/base.html" %}
+{% block title %}Shopping Cart — ShopEasy{% endblock %}
+
+{% block content %}
+
+{% if items %}
+
+<div class="cart-layout">
+
+  <!-- Items column -->
+  <div>
+    <div class="cart-items-header">
+      <h1>Shopping Cart</h1>
+      <span style="color:var(--clr-muted);font-size:.875rem;">{{ items|length }} item{{ items|length|pluralize }}</span>
+    </div>
+
+    {% for item in items %}
+    <div class="cart-item" data-product-id="{{ item.product.pk }}">
+
+      <!-- Thumbnail -->
+      <div class="cart-item-img">
+        {% if item.product.image %}
+          <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+        {% else %}
+          <div class="mini-placeholder" aria-hidden="true">🛍️</div>
+        {% endif %}
+      </div>
+
+      <!-- Info -->
+      <div class="cart-info">
+        <h3>{{ item.product.name }}</h3>
+        <p data-unit-price="{{ item.product.price }}">₹{{ item.product.price }} each</p>
+        {% if item.product.stock <= 4 and item.product.stock > 0 %}
+          <span class="stock-badge stock-low" style="margin-top:.25rem;">Only {{ item.product.stock }} left</span>
+        {% endif %}
+      </div>
+
+      <!-- Quantity stepper (AJAX-enabled) -->
+      <form class="qty-form" method="post" action="{% url 'update_cart' item.product.pk %}">
+        {% csrf_token %}
+        <div class="qty-stepper" role="group" aria-label="Quantity">
+          <button type="button" data-action="dec" aria-label="Decrease quantity">−</button>
+          <input type="number" name="quantity"
+                 value="{{ item.quantity }}"
+                 min="0" max="{{ item.product.stock }}"
+                 aria-label="Quantity for {{ item.product.name }}">
+          <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
+        </div>
+        <button type="submit" class="btn btn-secondary btn-sm">Update</button>
+      </form>
+
+      <!-- Line total -->
+      <div class="cart-item-price">₹{{ item.subtotal }}</div>
+
+      <!-- Remove -->
+      <a class="remove-btn"
+         href="{% url 'remove_from_cart' item.product.pk %}"
+         data-remove-url="{% url 'remove_from_cart' item.product.pk %}"
+         aria-label="Remove {{ item.product.name }} from cart"
+         title="Remove item">✕</a>
+
+    </div>
+    {% endfor %}
+
+    <div style="margin-top:1rem;">
+      <a class="btn btn-secondary" href="{% url 'home' %}">← Continue Shopping</a>
+    </div>
+  </div>
+
+  <!-- Summary sidebar -->
+  <aside class="summary" aria-label="Order summary">
+    <h2>Order Summary</h2>
+
+    {% for item in items %}
+    <div class="summary-line">
+      <span>{{ item.product.name }} × {{ item.quantity }}</span>
+      <span>₹{{ item.subtotal }}</span>
+    </div>
+    {% endfor %}
+
+    <div class="summary-total">
+      <span>Total</span>
+      <strong data-cart-total="{{ total }}">₹{{ total }}</strong>
+    </div>
+
+    <a class="btn btn-primary btn-full" href="{% url 'checkout' %}" style="margin-top:.5rem;">
+      Proceed to Checkout →
+    </a>
+
+    <p style="text-align:center;font-size:.75rem;color:var(--clr-muted);margin-top:.75rem;">
+      🔒 Secure checkout
+    </p>
+  </aside>
+
+</div>
+
+{% else %}
+<div class="empty" style="padding:5rem 1.5rem;">
+  <div class="empty-icon">🛒</div>
+  <h3>Your cart is empty</h3>
+  <p>Looks like you haven't added anything yet. Start shopping!</p>
+  <a class="btn btn-primary" href="{% url 'home' %}">Browse Products</a>
+</div>
+{% endif %}
+
+{% endblock %}

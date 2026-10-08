@@ -1,0 +1,80 @@
+{% extends "store/base.html" %}
+{% block title %}Checkout — ShopEasy{% endblock %}
+
+{% block content %}
+
+<div class="checkout-layout">
+
+  <!-- Delivery form -->
+  <div class="form-card">
+    <h2>Delivery Details</h2>
+
+    <form method="post" class="needs-validation" novalidate>
+      {% csrf_token %}
+
+      <!-- Address field -->
+      <div class="form-group">
+        <label for="id_address">Delivery Address <span style="color:var(--clr-danger)">*</span></label>
+        <textarea id="id_address"
+                  name="address"
+                  class="form-control {% if form.address.errors %}is-invalid{% endif %}"
+                  rows="4"
+                  placeholder="Full delivery address including city, state and PIN"
+                  required
+                  aria-describedby="address-help">{{ form.address.value|default_if_none:'' }}</textarea>
+        {% if form.address.errors %}
+          <span class="field-error" style="display:block;">{{ form.address.errors|join:", " }}</span>
+        {% else %}
+          <span class="field-error" id="address-help"></span>
+        {% endif %}
+      </div>
+
+      <!-- Phone field -->
+      <div class="form-group">
+        <label for="id_phone">Phone Number <span style="color:var(--clr-danger)">*</span></label>
+        <input id="id_phone"
+               type="tel"
+               name="phone"
+               class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+               placeholder="e.g. +91 98765 43210"
+               value="{{ form.phone.value|default_if_none:'' }}"
+               required
+               pattern="[0-9+\-\s()]{6,20}"
+               aria-describedby="phone-help">
+        {% if form.phone.errors %}
+          <span class="field-error" style="display:block;">{{ form.phone.errors|join:", " }}</span>
+        {% else %}
+          <span class="field-error" id="phone-help"></span>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:.5rem;">
+        🛍️ Place Order
+      </button>
+
+      <p style="text-align:center;font-size:.75rem;color:var(--clr-muted);margin-top:.75rem;">
+        🔒 Your information is encrypted and secure
+      </p>
+    </form>
+  </div>
+
+  <!-- Order summary sidebar -->
+  <aside class="summary" aria-label="Order summary">
+    <h2>Order Summary</h2>
+
+    {% for product, qty in products %}
+    <div class="checkout-item">
+      <span>{{ product.name }} × {{ qty }}</span>
+      <strong>₹{% widthratio product.price 1 qty %}</strong>
+    </div>
+    {% endfor %}
+
+    <div class="summary-total">
+      <span>Total</span>
+      <strong>₹{{ total }}</strong>
+    </div>
+  </aside>
+
+</div>
+
+{% endblock %}

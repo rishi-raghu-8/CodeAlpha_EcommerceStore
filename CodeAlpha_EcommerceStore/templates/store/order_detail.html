@@ -1,0 +1,84 @@
+{% extends "store/base.html" %}
+{% block title %}Order #{{ order.id }} — ShopEasy{% endblock %}
+
+{% block content %}
+
+<!-- Success banner (only shown on fresh order placement via redirect) -->
+{% if request.GET.new %}
+<div class="order-success">
+  <div class="success-icon">✓</div>
+  <h1>Order Placed!</h1>
+  <p>Your order #{{ order.id }} has been received and is being processed.</p>
+</div>
+{% endif %}
+
+<!-- Order detail card -->
+<div class="order-detail">
+
+  <!-- Header row -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+    <h2>Order #{{ order.id }}</h2>
+
+    {% if order.status == "Pending" %}
+      <span class="status-badge status-pending">{{ order.status }}</span>
+    {% elif order.status == "Processing" %}
+      <span class="status-badge status-processing">{{ order.status }}</span>
+    {% elif order.status == "Shipped" %}
+      <span class="status-badge status-shipped">{{ order.status }}</span>
+    {% elif order.status == "Delivered" or order.status == "Completed" %}
+      <span class="status-badge status-completed">{{ order.status }}</span>
+    {% elif order.status == "Cancelled" %}
+      <span class="status-badge status-cancelled">{{ order.status }}</span>
+    {% endif %}
+  </div>
+
+  <!-- Meta grid -->
+  <div class="order-detail-grid">
+    <div class="info-block">
+      <h3>Delivery Address</h3>
+      <p>{{ order.address }}</p>
+    </div>
+    <div class="info-block">
+      <h3>Contact</h3>
+      <p>📞 {{ order.phone }}</p>
+    </div>
+    <div class="info-block">
+      <h3>Placed On</h3>
+      <time datetime="{{ order.created_at|date:'c' }}">{{ order.created_at|date:"d M Y, h:i A" }}</time>
+    </div>
+    <div class="info-block">
+      <h3>Last Updated</h3>
+      <time datetime="{{ order.updated_at|date:'c' }}">{{ order.updated_at|date:"d M Y, h:i A" }}</time>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Items table -->
+  <h3 style="font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--clr-muted);margin-bottom:1rem;">Items Ordered</h3>
+
+  {% for item in order.items.all %}
+  <div class="order-line">
+    <span>
+      <strong>{{ item.product.name }}</strong>
+      <span style="color:var(--clr-muted);"> × {{ item.quantity }} @ ₹{{ item.price }}</span>
+    </span>
+    <strong>₹{{ item.subtotal }}</strong>
+  </div>
+  {% endfor %}
+
+  <!-- Total -->
+  <div class="summary-row">
+    <strong>Order Total</strong>
+    <strong style="font-size:1.5rem;color:var(--clr-navy);">₹{{ order.total_amount }}</strong>
+  </div>
+
+  <!-- Actions -->
+  <div style="display:flex;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap;">
+    <a class="btn btn-secondary" href="{% url 'orders' %}">← All Orders</a>
+    <a class="btn btn-primary" href="{% url 'home' %}">Continue Shopping</a>
+  </div>
+
+</div>
+
+{% endblock %}

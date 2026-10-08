@@ -1,0 +1,58 @@
+{% extends "store/base.html" %}
+{% block title %}{{ product.name }} — ShopEasy{% endblock %}
+
+{% block content %}
+
+<nav aria-label="Breadcrumb" style="font-size:.8rem;color:var(--clr-muted);margin-bottom:1.5rem;">
+  <a href="{% url 'home' %}" style="color:var(--clr-accent);">Home</a>
+  <span style="margin:0 .5rem;">›</span>
+  <span>{{ product.name }}</span>
+</nav>
+
+<div class="detail">
+
+  <!-- Image -->
+  <div class="detail-img-wrap">
+    {% if product.image %}
+      <img class="detail-img" src="{{ product.image.url }}" alt="{{ product.name }}">
+    {% else %}
+      <div class="detail-placeholder" aria-hidden="true">🛍️</div>
+    {% endif %}
+  </div>
+
+  <!-- Info -->
+  <div class="detail-info">
+    <p class="eyebrow">Product Details</p>
+    <h1>{{ product.name }}</h1>
+    <p class="detail-desc">{{ product.description }}</p>
+
+    <div class="detail-meta">
+      <div class="big-price">₹{{ product.price }}</div>
+
+      <!-- Stock badge -->
+      {% if product.stock == 0 %}
+        <span class="stock-badge stock-out">Out of Stock</span>
+      {% elif product.stock <= 4 %}
+        <span class="stock-badge stock-low">⚡ Only {{ product.stock }} left — order soon!</span>
+      {% else %}
+        <span class="stock-badge stock-in">✓ In Stock ({{ product.stock }} available)</span>
+      {% endif %}
+    </div>
+
+    <div class="detail-actions">
+      {% if product.stock %}
+        <a class="btn btn-primary btn-lg" href="{% url 'add_to_cart' product.pk %}">
+          🛒 Add to Cart
+        </a>
+      {% else %}
+        <button class="btn btn-secondary btn-lg" disabled style="opacity:.55;cursor:not-allowed;">
+          Out of Stock
+        </button>
+      {% endif %}
+      <a class="btn btn-secondary" href="{% url 'home' %}">← Back</a>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

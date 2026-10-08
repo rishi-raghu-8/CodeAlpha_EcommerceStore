@@ -1,0 +1,77 @@
+{% extends "store/base.html" %}
+{% block title %}Create Account — ShopEasy{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+
+    <div class="auth-header">
+      <p class="eyebrow" style="color:rgba(255,255,255,.6);">Get started today</p>
+      <h1>Create Account</h1>
+      <p>Join ShopEasy and start shopping in seconds.</p>
+    </div>
+
+    <div class="auth-body">
+      <form method="post" class="auth-form needs-validation" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div style="background:var(--clr-danger-lt);color:var(--clr-danger);padding:.75rem 1rem;border-radius:var(--r-md);font-size:.875rem;margin-bottom:1.25rem;border:1px solid #fca5a5;">
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}<span style="color:var(--clr-danger)">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+            <small style="color:var(--clr-muted);font-size:.75rem;">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <span class="field-error" style="display:block;">{{ field.errors|join:", " }}</span>
+          {% else %}
+            <span class="field-error"></span>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:.25rem;">
+          Create Account →
+        </button>
+      </form>
+    </div>
+
+    <div class="auth-footer">
+      Already have an account? <a href="{% url 'login' %}">Sign in</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-form input, .auth-form select {
+  width: 100%;
+  padding: .7rem 1rem;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--r-md);
+  font: inherit;
+  font-size: .875rem;
+  color: var(--clr-text);
+  background: var(--clr-surface);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  outline: none;
+  margin-top: .25rem;
+}
+.auth-form input:focus {
+  border-color: var(--clr-accent);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+}
+.auth-form label { font-size: .875rem; font-weight: 600; display: block; }
+</style>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "store/base.html" %}
+{% block title %}ShopEasy — Products{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero" aria-label="Welcome banner">
+  <div class="hero-blob" aria-hidden="true"></div>
+  <div class="hero-content">
+    <p class="eyebrow">Online Store</p>
+    <h1>Everything you need,<br>in one place.</h1>
+    <p>Browse quality products and order with ease — fast shipping, easy returns.</p>
+    <div class="hero-actions">
+      <a class="btn-hero" href="#products">Shop Now</a>
+      {% if not user.is_authenticated %}
+        <a class="btn-hero-ghost" href="{% url 'register' %}">Create Account</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Product grid -->
+<div class="section-heading" id="products">
+  <h2>Products</h2>
+  {% if q %}<span class="count">Search results for "{{ q }}"</span>{% endif %}
+</div>
+
+<div class="grid">
+  {% for product in products %}
+  <article class="card">
+
+    <div class="card-img-wrap">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+      {% else %}
+        <div class="placeholder" aria-hidden="true">🛍️</div>
+      {% endif %}
+    </div>
+
+    <div class="card-body">
+      <h3>{{ product.name }}</h3>
+      <p class="desc">{{ product.description|truncatechars:90 }}</p>
+
+      <div class="price">₹{{ product.price }}</div>
+
+      <!-- Stock badge -->
+      {% if product.stock == 0 %}
+        <span class="stock-badge stock-out">Out of Stock</span>
+      {% elif product.stock <= 4 %}
+        <span class="stock-badge stock-low">Low Stock — {{ product.stock }} left</span>
+      {% else %}
+        <span class="stock-badge stock-in">In Stock</span>
+      {% endif %}
+
+      <div class="actions">
+        <a class="btn btn-secondary btn-sm" href="{% url 'product_detail' product.pk %}">Details</a>
+        {% if product.stock %}
+          <a class="btn btn-primary btn-sm" href="{% url 'add_to_cart' product.pk %}">Add to Cart</a>
+        {% endif %}
+      </div>
+    </div>
+
+  </article>
+  {% empty %}
+  <div class="empty">
+    <div class="empty-icon">🔍</div>
+    <h3>No products found</h3>
+    <p>Try a different search term or browse all products.</p>
+    {% if q %}<a class="btn btn-primary" href="{% url 'home' %}">Browse All</a>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
